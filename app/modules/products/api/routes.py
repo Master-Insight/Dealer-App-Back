@@ -1,13 +1,13 @@
 # app/modules/products/api/routes.py
 from fastapi import APIRouter
-from app.services.supabase_client import supabase
+from app.modules.products.api.controller import handle_get_products
 
 router = APIRouter()
 
 @router.get("/")
 def get_products():
-    response = supabase.table("products").select("*").execute()
-    return response.data
+    """Devuelve todos los productos"""
+    return handle_get_products()
 
 @router.post("/")
 def create_user(product: dict):
