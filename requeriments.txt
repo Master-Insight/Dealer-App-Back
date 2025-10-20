@@ -1,0 +1,12 @@
+# Core API
+fastapi
+uvicorn[standard]
+python-dotenv
+pydantic-settings
+
+# Data & DB
+supabase
+pandas
+SQLAlchemy>=2.0
+psycopg2-binary
+openpyxl
