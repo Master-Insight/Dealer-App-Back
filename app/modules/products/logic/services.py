@@ -1,11 +1,21 @@
 # app/modules/products/logic/services.py
-from app.modules.products.data.dao import fetch_all_products
+from app.modules.products.data.dao import ProductDAO
 
-def get_all_products():
-    """Aplica lógica adicional si es necesario"""
-    products = fetch_all_products()
+class ProductService:
+    """Capa de lógica para productos."""
 
-    # ejemplo: podrías filtrar, ordenar o transformar
-    # products = sorted(products, key=lambda p: p["name"])
+    def __init__(self):
+        self.dao = ProductDAO()
 
-    return products
+    def list_products(self):
+        """Devuelve todos los productos (posible filtrado, orden, etc.)"""
+        products = self.dao.get_all()
+        # Aquí podrías aplicar filtros, ordenar, etc.
+        return products
+
+    def get_product(self, product_id: int):
+        """Devuelve un producto por ID"""
+        product = self.dao.get_by_id(product_id)
+        if not product:
+            raise ValueError(f"Producto con ID {product_id} no encontrado")
+        return product

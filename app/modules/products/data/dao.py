@@ -1,7 +1,16 @@
 # app/modules/products/data/dao.py
 from app.services.supabase_client import supabase
 
-def fetch_all_products():
-    """Obtiene todos los productos desde Supabase"""
-    response = supabase.table("products").select("*").execute()
-    return response.data
+class ProductDAO:
+    """Capa de acceso a datos para productos."""
+
+    def __init__(self):
+        self.table = supabase.table("products")
+
+    def get_all(self):
+        response = self.table.select("*").execute()
+        return response.data
+
+    def get_by_id(self, product_id: int):
+        response = self.table.select("*").eq("id", product_id).execute()
+        return response.data[0] if response.data else None
