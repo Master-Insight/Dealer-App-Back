@@ -10,7 +10,7 @@ class ProductController:
     def __init__(self):
         self.service = ProductService()
 
-    def get_products(self) -> List[Product]:
+    def get_products(self) -> List[Product]: # "->" Sirve para indicar el tipo de dato que devuelve una función
         try:
             return self.service.list_products()
         except Exception as e:
