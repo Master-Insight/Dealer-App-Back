@@ -19,3 +19,6 @@ class ProductService:
         if not product:
             raise ValueError(f"Producto con ID {product_id} no encontrado")
         return product
+
+    def create_product(product_data: dict):
+        return self.dao.create(product_data)
