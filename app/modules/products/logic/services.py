@@ -8,17 +8,17 @@ class ProductService(BaseService):
     def __init__(self):
         super().__init__(ProductDAO())
 
-    def list_products(self):
-        """Devuelve todos los productos (posible filtrado, orden, etc.)."""
-        products = self.list_all()
-        # Ejemplo: podés filtrar o transformar acá
-        # products = [p for p in products if p["activo"]]
-        return products
+    # def list_products(self):
+    #     """Devuelve todos los productos (posible filtrado, orden, etc.)."""
+    #     products = self.list_all()
+    #     # Ejemplo: podés filtrar o transformar acá
+    #     # products = [p for p in products if p["activo"]]
+    #     return products
 
-    def get_product(self, product_id: int):
-        """Devuelve un producto por ID."""
-        return self.get_by_id(product_id)
+    # def get_product(self, product_id: int):
+    #     """Devuelve un producto por ID."""
+    #     return self.get_by_id(product_id)
 
-    def create_product(self, product_data: dict):
-        """Crea un nuevo producto."""
-        return self.create(product_data)
+    # def create_product(self, product_data: dict):
+    #     """Crea un nuevo producto."""
+    #     return self.create(product_data)
