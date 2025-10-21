@@ -21,4 +21,4 @@ class ProductService:
         return product
 
     def create_product(product_data: dict):
-        return self.dao.create(product_data)
+        return self.dao.insert(product_data)
