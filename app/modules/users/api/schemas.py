@@ -7,19 +7,27 @@ from pydantic import BaseModel, EmailStr
 from typing import Optional
 from datetime import datetime
 
+
 class UserBase(BaseModel):
     email: EmailStr
     role: str = "user"
+
 
 class UserCreate(BaseModel):
     email: EmailStr
     password: str
     role: str = "user"
 
+
 class User(UserBase):
     id: str
     created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
+
+class ResponseModel(BaseModel):
+    success: bool
+    message: str
+    data: List[User]
