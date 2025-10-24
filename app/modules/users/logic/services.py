@@ -24,11 +24,10 @@ class UserService:
             }
             return self.dao.create_profile(profile)
 
+        except ValueError as ve:
+            ResponseBuilder.error("Datos inválidos", str(ve), 400)
         except Exception as e:
-            raise HTTPException(
-                status_code=400,
-                detail=ResponseBuilder.error("Error al crear el usuario", str(e)),
-            )
+            ResponseBuilder.error("Error interno al registrar usuario", str(e), 500)
 
     def list_users(self):
         return self.dao.get_all()

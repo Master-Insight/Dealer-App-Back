@@ -1,5 +1,7 @@
 # app/libraries/utils/response_builder.py
 from typing import Any, Optional, Dict
+from fastapi import HTTPException
+
 
 class ResponseBuilder:
     """Utilidad para estandarizar respuestas de la API."""
@@ -13,10 +15,11 @@ class ResponseBuilder:
         }
 
     @staticmethod
-    def error(error: str, details: Optional[Any] = None, status_code: int = 400) -> Dict:
-        return {
+    def error(error: str, details: Optional[Any] = None, status_code: int = 400):
+        """Lanza una HTTPException con formato normalizado."""
+        content = {
             "success": False,
             "error": error,
             "details": details,
-            "status_code": status_code,
         }
+        raise HTTPException(status_code=status_code, detail=content)
