@@ -13,10 +13,7 @@ class UserController:
 
     def list_users(self) -> List[User]:
         """Obtiene todos los registros."""
-        try:
-            return self.service.list_users()
-        except Exception as e:
-            ResponseBuilder.error("Error al listar usuarios", str(e), 500)
+        return self.service.list_users()
 
     def register_user(self, user: UserCreate):
         return self.service.register_user(user.email, user.password, user.role)
