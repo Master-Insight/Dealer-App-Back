@@ -14,5 +14,5 @@ class UserDAO:
         res = self.table.select("*").eq("email", email).execute()
         return res.data[0] if res.data else None
 
-    # def create_profile(self, user_data: dict):
-    #     return self.table.insert(user_data).execute().data[0]
+    def create_profile(self, user_data: dict):
+        return self.table.insert(user_data).execute().data[0]

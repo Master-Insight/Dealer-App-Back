@@ -6,9 +6,9 @@ from .controller import UserController
 router = APIRouter()
 controller = UserController()
 
-# @router.post("/register", response_model=User)
-# def register_user(user: UserCreate):
-#     return controller.register_user(user)
+@router.post("/register", response_model=User)
+def register_user(user: UserCreate):
+    return controller.register_user(user)
 
 @router.get("/", response_model=list[User])
 def list_users():

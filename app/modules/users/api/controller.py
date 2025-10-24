@@ -17,8 +17,8 @@ class UserController():
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Error al listar: {str(e)}")
 
-    # def register_user(self, user: UserCreate):
-    #     return self.service.register_user(user.email, user.password, user.role)
+    def register_user(self, user: UserCreate):
+        return self.service.register_user(user.email, user.password, user.role)
 
     # def get_products(self) -> List[Product]: # "->" Sirve para indicar el tipo de dato que devuelve una función
     #     try:
