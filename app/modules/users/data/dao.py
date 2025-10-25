@@ -22,5 +22,10 @@ class UserDAO:
     def create_profile(self, user_data: dict):
         return self.table.insert(user_data).execute().data[0]
 
+    def update_role_by_email(self, email: str, role: str):
+        return (
+            self.table.update({"role": role}).eq("email", email).single().execute().data
+        )
+
     def delete_profile(self, user_id: str):
         return self.table.delete().eq("id", user_id).execute()

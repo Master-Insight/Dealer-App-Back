@@ -13,15 +13,20 @@ class UserController:
 
     def list_users(self) -> List[User]:
         """Obtiene todos los registros."""
-        return ResponseBuilder.success(self.service.list_users())
-
-    def register_user(self, user: UserCreate):
         return ResponseBuilder.success(
-            self.service.register_user(user.email, user.password, user.role)
+            data=users, message="Usuarios obtenidos correctamente"
         )
 
+    # TODO en caso de usar un role distinto  a "user" deberia confirmar medidas de seguridad para limitar acción
+    def register_user(self, user: UserCreate):
+        profile = self.service.register_user(
+            user.email, user.password
+        )  # se quita x seguridad -->, user.role
+        return ResponseBuilder.success(profile, "Usuario registrado correctamente")
+
     def delete_user(self, id: str):
-        return ResponseBuilder.success(self.service.delete_user(id))
+        result = self.service.delete_user(id)
+        return ResponseBuilder.success(result, "Usuario eliminado correctamente")
 
     # def get_products(self) -> List[Product]: # "->" Sirve para indicar el tipo de dato que devuelve una función
     #     try:

@@ -14,27 +14,59 @@ class UserService:
 
     def register_user(self, email: str, password: str, role: str = "user"):
 
+        # 1) Intentar crear usuario en Auth (o confirmar existencia)
         try:
             """Crea usuario en Supabase Auth."""
             auth_user = supabase.auth.sign_up({"email": email, "password": password})
-
-            """ Crear perfil en tu tabla user_profiles """
-            profile = {
-                "id": auth_user.user.id,
-                "email": email,
-                "role": role,
-            }
-            return self.dao.create_profile(profile)
+            user_id = auth_user.user.id
 
         except Exception as e:
-            if "User already registered" in str(e):
-                raise ValidationError("El email ya está registrado")
-            if "duplicate key value violates unique constraint" in str(e):
-                raise ValidationError("El email ya está registrado")
-            if "Password should be at least 6 characters" in str(e):
+            error_str = str(e)
+
+            # Caso: Contraseña inválida
+            if "Password should be at least 6 characters" in error_str:
                 raise ValidationError("La contraseña debe tener al menos 6 caracteres")
 
-            raise AuthError("Error al registrar usuario", details={"error": str(e)})
+            # Caso: Email ya registrado -> Sign-in para obtener ID real
+            if "User already registered" in error_str:
+                # El usuario ya existe en Auth; opcionalmente confirmamos credenciales
+                auth_user = supabase.auth.sign_in_with_password(
+                    {"email": email, "password": password}
+                )
+                if not auth_user or not auth_user.user:
+                    raise AuthError(
+                        "Email duplicado. No se puede loguear. Credenciales inválidas o usuario bloqueado",
+                        details={"supabase_error": error_str},
+                    )
+                user_id = auth_user.user.id
+
+            else:
+                raise AuthError(
+                    "Error al registrar usuario", details={"supabase_error": error_str}
+                )
+
+        # 2) Revisar/asegurar el perfil (el trigger debería haberlo creado)
+        profile = self.dao.get_by_email(email)
+        if profile:
+            # 2a) Si el perfil existe, asegurar el role (idempotente)
+            current_role = profile.get("role")
+            if current_role != role:
+                # Si querés restringir quién puede cambiar roles, validalo antes
+                updated = self.dao.update_role_by_email(email, role)
+                # `update_role_by_email` debería devolver el registro actualizado
+                return updated
+            # No hay cambios de rol → devolver perfil existente
+            return profile
+
+        # 3) Si NO existe perfil (trigger falló), lo creamos manualmente
+        #    (si no tenemos user_id, este es un buen lugar para resolverlo si es crítico)
+        new_profile = {
+            "id": user_id,  # si es None y tu tabla lo requiere NOT NULL, resolvé antes el id
+            "email": email,
+            "role": role,
+        }
+        created = self.dao.create_profile(new_profile)
+        return created
 
     def list_users(self):
         return self.dao.get_all()

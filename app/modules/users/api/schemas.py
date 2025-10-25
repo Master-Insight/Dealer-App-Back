@@ -1,22 +1,23 @@
 # app/modules/users/api/schemas.py
+from enum import Enum
 from typing import List, Optional, Union
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from datetime import datetime
 
-from pydantic import BaseModel, EmailStr
-from typing import Optional
-from datetime import datetime
+
+class RoleEnum(str, Enum):
+    code = "code"
+    admin = "admin"
+    user = "user"
 
 
 class UserBase(BaseModel):
     email: EmailStr
-    role: str = "user"
+    role: Optional[RoleEnum] = RoleEnum.user
 
 
-class UserCreate(BaseModel):
-    email: EmailStr
+class UserCreate(UserBase):
     password: str
-    role: str = "user"
 
 
 class User(UserBase):
