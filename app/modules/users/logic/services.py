@@ -29,8 +29,9 @@ class UserService:
         except Exception as e:
             if "User already registered" in str(e):
                 raise ValidationError("El email ya está registrado")
+            if "duplicate key value violates unique constraint" in str(e):
+                raise ValidationError("El email ya está registrado")
             if "Password should be at least 6 characters" in str(e):
-
                 raise ValidationError("La contraseña debe tener al menos 6 caracteres")
 
             raise AuthError("Error al registrar usuario", details={"error": str(e)})
