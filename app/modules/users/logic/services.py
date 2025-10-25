@@ -1,11 +1,9 @@
 # app/modules/users/logic/services.py
-from fastapi import HTTPException
 from app.libraries.exceptions.app_exceptions import (
     AuthError,
     NotFoundError,
     ValidationError,
 )
-from app.libraries.utils.response_builder import ResponseBuilder
 from ..data.dao import UserDAO
 from app.services.supabase_client import supabase
 
@@ -26,7 +24,7 @@ class UserService:
                 "email": email,
                 "role": role,
             }
-            return ResponseBuilder.success(self.dao.create_profile(profile))
+            return self.dao.create_profile(profile)
 
         except Exception as e:
             if "User already registered" in str(e):
@@ -38,7 +36,7 @@ class UserService:
             raise AuthError("Error al registrar usuario", details={"error": str(e)})
 
     def list_users(self):
-        return ResponseBuilder.success(self.dao.get_all())
+        return self.dao.get_all()
 
     def get_user(self, user_id: str):
         user = supabase.table("users").select("*").eq("id", user_id).execute()

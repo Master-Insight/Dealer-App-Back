@@ -1,5 +1,5 @@
 # app/modules/users/api/schemas.py
-from typing import List, Optional
+from typing import List, Optional, Union
 from pydantic import BaseModel
 from datetime import datetime
 
@@ -30,4 +30,4 @@ class User(UserBase):
 class ResponseModel(BaseModel):
     success: bool
     message: str
-    data: List[User]
+    data: Optional[Union[User, List[User], dict, str]] = None

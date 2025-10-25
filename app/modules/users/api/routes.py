@@ -1,13 +1,13 @@
 # app/modules/users/api/routes.py
 from fastapi import APIRouter, Depends, HTTPException
-from .schemas import User, UserCreate, ResponseModel
+from .schemas import UserCreate, ResponseModel
 from .controller import UserController
 
 router = APIRouter()
 controller = UserController()
 
 
-@router.post("/register", response_model=User)
+@router.post("/register", response_model=ResponseModel)
 def register_user(user: UserCreate):
     return controller.register_user(user)
 
