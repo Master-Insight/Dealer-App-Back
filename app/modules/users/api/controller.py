@@ -16,7 +16,9 @@ class UserController:
         return ResponseBuilder.success(self.service.list_users())
 
     def register_user(self, user: UserCreate):
-        return self.service.register_user(user.email, user.password, user.role)
+        return ResponseBuilder.success(
+            self.service.register_user(user.email, user.password, user.role)
+        )
 
     # def get_products(self) -> List[Product]: # "->" Sirve para indicar el tipo de dato que devuelve una función
     #     try:
