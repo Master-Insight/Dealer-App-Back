@@ -15,3 +15,8 @@ def register_user(user: UserCreate):
 @router.get("/", response_model=ResponseModel)
 def list_users():
     return controller.list_users()
+
+
+@router.delete("/delete/{user_id}", response_model=ResponseModel)
+def delete_user(user_id: str):
+    return controller.delete_user(user_id)

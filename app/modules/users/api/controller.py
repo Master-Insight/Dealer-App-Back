@@ -20,6 +20,9 @@ class UserController:
             self.service.register_user(user.email, user.password, user.role)
         )
 
+    def delete_user(self, id: str):
+        return ResponseBuilder.success(self.service.delete_user(id))
+
     # def get_products(self) -> List[Product]: # "->" Sirve para indicar el tipo de dato que devuelve una función
     #     try:
     #         return self.service.list_products()

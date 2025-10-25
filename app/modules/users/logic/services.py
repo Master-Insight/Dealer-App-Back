@@ -44,3 +44,23 @@ class UserService:
         if not user.data:
             raise NotFoundError(f"Usuario con id {user_id} no encontrado")
         return user.data[0]
+
+    def delete_user(self, user_id: str):
+        try:
+            # 1️⃣ Verificar si el usuario existe en tu tabla
+            user = self.dao.get_by_id(user_id)
+            if not user:
+                raise NotFoundError(f"Usuario con id {user_id} no encontrado")
+
+            # 2️⃣ Eliminar perfil en tu base de datos
+            self.dao.delete_profile(user_id)
+
+            # 3️⃣ Eliminar usuario en Supabase Auth (requiere Service Role Key)
+            supabase.auth.admin.delete_user(user_id)
+
+            return {"message": f"Usuario {user_id} eliminado correctamente"}
+
+        except NotFoundError:
+            raise
+        except Exception as e:
+            raise AuthError("Error al eliminar usuario", details={"error": str(e)})
