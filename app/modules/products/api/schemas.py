@@ -1,7 +1,33 @@
 # app/modules/products/api/schemas.py
-from typing import List, Optional
+from typing import List, Optional, Union
+from enum import Enum
 from pydantic import BaseModel
 from datetime import datetime
+
+
+class ProductState(str, Enum):
+    usado = "Usado"
+    nuevo = "Nuevo"
+    areparar = "A reparar"
+
+
+class ProductFuelType(str, Enum):
+    nafta = "Nafta"
+    gas = "Gas"
+    diesel = "Diesel"
+    electrico = "Eléctrico"
+
+
+class ProductTransmision(str, Enum):
+    manual = "Manual"
+    automatica = "Automática"
+
+
+class ProductTypes(str, Enum):
+    auto = "Auto"
+    moto = "Moto"
+    camioneta = "Camioneta"
+    camion = "Camión"
 
 
 class ProductBase(BaseModel):
@@ -10,17 +36,18 @@ class ProductBase(BaseModel):
     variant: Optional[str] = None
     year: Optional[int] = None
     mileage: Optional[int] = None
-    fuel_type: Optional[str] = None
-    transmission: Optional[str] = None
+    fuel_type: Optional[ProductFuelType] = None
+    transmission: Optional[ProductTransmision] = None
     color: Optional[str] = None
     doors: Optional[int] = None
-    ubicacion: Optional[str] = None
-    estado: Optional[str] = None
-    descripcion: Optional[str] = None
+    location: Optional[str] = None
+    state: Optional[ProductState] = None
+    description: Optional[str] = None
+    active: bool
+    photos_url: Optional[List[str]] = None
     price: Optional[float] = None
     labels: Optional[List[str]] = None
-    vehicle_type: Optional[str] = None
-    fotos_url: Optional[List[str]] = None
+    vehicle_type: Optional[ProductTypes] = None
 
 
 class ProductCreate(ProductBase):
@@ -31,7 +58,12 @@ class Product(ProductBase):
     id: int
     created_at: datetime
     update: Optional[datetime] = None
-    activo: bool
 
     class Config:
         from_attributes = True
+
+
+class ResponseModel(BaseModel):
+    success: bool
+    message: str
+    data: Optional[Union[Product, List[Product], dict, str]] = None

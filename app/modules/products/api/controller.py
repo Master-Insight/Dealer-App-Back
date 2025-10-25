@@ -1,11 +1,12 @@
 # app/modules/products/api/controller.py
 from fastapi import HTTPException
 from typing import List
-from app.libraries.customs.controller_base import CustomController
+from app.libraries.customs.controller_response import ResponseController
 from .schemas import Product, ProductCreate
 from ..logic.services import ProductService
 
-class ProductController(CustomController[Product, ProductCreate]):
+
+class ProductController(ResponseController[Product, ProductCreate]):
     """Controlador específico de productos."""
 
     def __init__(self):
