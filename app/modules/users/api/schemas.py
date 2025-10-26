@@ -18,7 +18,7 @@ class UserLogin(BaseModel):
 
 class UserBase(BaseModel):
     email: EmailStr
-    role: Optional[RoleEnum] = RoleEnum.user
+    # role: Optional[RoleEnum] = RoleEnum.user
 
 
 class UserCreate(UserBase):
