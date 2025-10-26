@@ -19,66 +19,35 @@ class ResponseController(Generic[T, C]):
 
     def list_all(self) -> List[T]:
         """Obtiene todos los registros."""
-        try:
-            return ResponseBuilder.success(self.service.list_all())
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Error al listar: {str(e)}")
+        return ResponseBuilder.success(self.service.list_all())
 
     def get_by_id(self, item_id: int) -> Optional[T]:
         """Obtiene un registro por ID."""
-        try:
-            item = self.service.get_by_id(item_id)
-            if not item:
-                raise HTTPException(
-                    status_code=404, detail=f"Registro con ID {item_id} no encontrado"
-                )
-            return ResponseBuilder.success(item)
-        except HTTPException:
-            raise
-        except Exception as e:
+        item = self.service.get_by_id(item_id)
+        if not item:
             raise HTTPException(
-                status_code=500, detail=f"Error al obtener registro: {str(e)}"
+                status_code=404, detail=f"Registro con ID {item_id} no encontrado"
             )
+        return ResponseBuilder.success(item)
 
     def create(self, data: C) -> T:
         """Crea un nuevo registro."""
-        try:
-            return ResponseBuilder.success(self.service.create(data.dict()))
-        except Exception as e:
-            raise HTTPException(
-                status_code=500, detail=f"Error al crear registro: {str(e)}"
-            )
+        return ResponseBuilder.success(self.service.create(data.dict()))
 
     def update(self, item_id: int, data: Dict[str, Any]) -> T:
         """Actualiza un registro existente."""
-        try:
-            updated = self.service.update(item_id, data)
-            if not updated:
-                raise HTTPException(
-                    status_code=404, detail=f"Registro con ID {item_id} no encontrado"
-                )
-            return ResponseBuilder.success(updated)
-        except HTTPException:
-            raise
-        except Exception as e:
+        updated = self.service.update(item_id, data)
+        if not updated:
             raise HTTPException(
-                status_code=500, detail=f"Error al actualizar registro: {str(e)}"
+                status_code=404, detail=f"Registro con ID {item_id} no encontrado"
             )
+        return ResponseBuilder.success(updated)
 
     def delete(self, item_id: int) -> Dict[str, Any]:
         """Elimina un registro."""
-        try:
-            success = self.service.delete(item_id)
-            if not success:
-                raise HTTPException(
-                    status_code=404, detail=f"Registro con ID {item_id} no encontrado"
-                )
-            return ResponseBuilder.success(
-                f"Registro {item_id} eliminado correctamente"
-            )
-        except HTTPException:
-            raise
-        except Exception as e:
+        success = self.service.delete(item_id)
+        if not success:
             raise HTTPException(
-                status_code=500, detail=f"Error al eliminar registro: {str(e)}"
+                status_code=404, detail=f"Registro con ID {item_id} no encontrado"
             )
+        return ResponseBuilder.success(f"Registro {item_id} eliminado correctamente")
