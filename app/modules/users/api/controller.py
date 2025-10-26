@@ -36,4 +36,5 @@ class UserController:
 
     def delete_user(self, id: str):
         result = self.service.delete_user(id)
-        return ResponseBuilder.success(result, "Usuario eliminado correctamente")
+        message = result.get("message", "Usuario eliminado correctamente")
+        return ResponseBuilder.success(result, message)
