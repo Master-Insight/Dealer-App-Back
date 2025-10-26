@@ -86,6 +86,16 @@ class UserService:
         except Exception:
             raise AuthError("Credenciales inválidas")
 
+    def logout(self):
+        try:
+            supabase.auth.sign_out()
+            return {"message": "Sesión cerrada ✅"}
+        except Exception as e:
+            error_msg = str(getattr(e, "message", e))
+            raise AuthError(
+                "No se pudo cerrar sesión", details={"supabase_error": error_msg}
+            )
+
     def list_users(self):
         return self.dao.get_all()
 

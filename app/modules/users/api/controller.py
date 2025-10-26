@@ -19,6 +19,10 @@ class UserController:
         data = self.service.login(login_data.email, login_data.password)
         return ResponseBuilder.success(data, "Login exitoso ✅")
 
+    def logout(self):
+        result = self.service.logout()
+        return ResponseBuilder.success(result, "Sesión cerrada ✅")
+
     def get_me(self, current_user):
         data = self.service.get_user(current_user.id)
         return ResponseBuilder.success(data, "Perfil del usuario obtenido")

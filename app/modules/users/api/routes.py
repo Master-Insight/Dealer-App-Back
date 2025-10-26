@@ -1,5 +1,5 @@
 # app/modules/users/api/routes.py
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Header
 from app.libraries.auth.dependencies import get_current_user
 from .schemas import UserCreate, ResponseModel, UserLogin
 from .controller import UserController
@@ -16,6 +16,11 @@ def register_user(user: UserCreate):
 @router.post("/login", response_model=ResponseModel)
 def login(user: UserLogin):
     return controller.login(user)
+
+
+@router.post("/logout", response_model=ResponseModel)
+def logout():
+    return controller.logout()
 
 
 @router.get("/me", response_model=ResponseModel)
