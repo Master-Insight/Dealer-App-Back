@@ -1,7 +1,7 @@
 # app/modules/products/api/schemas.py
 from datetime import datetime
 from enum import Enum
-from typing import List, Optional, Union
+from typing import List, Optional
 
 from pydantic import BaseModel
 
@@ -62,9 +62,3 @@ class Product(ProductBase):
 
     class Config:
         from_attributes = True
-
-
-class ResponseModel(BaseModel):
-    success: bool
-    message: str
-    data: Optional[Union[Product, List[Product], dict, str]] = None

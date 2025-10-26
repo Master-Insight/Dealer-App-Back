@@ -1,5 +1,5 @@
 # app/libraries/customs/controller_base.py
-from typing import TypeVar, Generic, Any, Dict
+from typing import TypeVar, Generic, Any
 
 from app.libraries.utils.response_builder import ResponseBuilder
 from app.libraries.utils.response_models import ApiResponse
