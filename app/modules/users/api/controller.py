@@ -1,10 +1,7 @@
 # app/modules/s/api/controller.py
-from app.libraries.customs.controller_base import CustomController
 from app.libraries.utils.response_builder import ResponseBuilder
-from .schemas import ResponseModel, User, UserCreate
+from .schemas import UserCreate
 from ..logic.services import UserService
-from fastapi import HTTPException
-from typing import List
 
 
 class UserController:
