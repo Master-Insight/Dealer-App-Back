@@ -3,6 +3,7 @@ from fastapi import FastAPI, Depends
 
 # from app.modules.presales.api.routes import router as presales_router
 from app.libraries.utils.response_builder import ResponseBuilder
+from app.modules.product_photos.api.routes import router as product_photos_router
 from app.modules.products.api.routes import router as products_router
 from app.modules.users.api.routes import router as users_router
 
@@ -18,6 +19,9 @@ def register_routes(app: FastAPI):
     # --- Rutas de módulos ---
     # app.include_router(presales_router, prefix="/presales", tags=["Presales"])
     app.include_router(products_router, prefix="/products", tags=["Products"])
+    app.include_router(
+        product_photos_router, prefix="/products", tags=["Product Photos"]
+    )
     app.include_router(users_router, prefix="/users", tags=["Users"])
 
     app.include_router(test_router, prefix="/test")
