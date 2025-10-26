@@ -1,4 +1,5 @@
 # app/modules/users/logic/services.py
+from app.libraries.customs.base_service import BaseService
 from app.libraries.exceptions.app_exceptions import (
     AuthError,
     NotFoundError,
@@ -8,9 +9,9 @@ from ..data.dao import UserDAO
 from app.services.supabase_client import supabase
 
 
-class UserService:
+class UserService(BaseService):
     def __init__(self):
-        self.dao = UserDAO()
+        super().__init__(UserDAO())
 
     def register_user(self, email: str, password: str, role: str = "user"):
 
@@ -97,11 +98,10 @@ class UserService:
             )
 
     def list_users(self):
-        return self.dao.get_all()
+        return self.list_all()
 
     def get_user(self, user_id: str):
-        user = self.dao.get_by_id(user_id)
-        return user
+        return self.get_by_id(user_id)
 
     def get_user_by_email(self, email: str):
         user = self.dao.get_by_email(email)
@@ -110,17 +110,20 @@ class UserService:
     def delete_user(self, user_id: str):
         try:
             # 1️⃣ Verificar si el usuario existe en tu tabla
-            user = self.dao.get_by_id(user_id)
-            if not user:
-                raise NotFoundError(f"Usuario con id {user_id} no encontrado")
+            user = self.get_by_id(user_id)
 
             # 2️⃣ Eliminar perfil en tu base de datos
-            self.dao.delete_profile(user_id)
+            deleted = self.dao.delete_profile(user_id)
+            if not deleted:
+                raise NotFoundError(f"Usuario con id {user_id} no encontrado")
 
             # 3️⃣ Eliminar usuario en Supabase Auth (requiere Service Role Key)
             supabase.auth.admin.delete_user(user_id)
 
-            return {"message": f"Usuario {user_id} eliminado correctamente"}
+            return {
+                "message": f"Usuario {user_id} eliminado correctamente",
+                "user": {"id": user_id, "email": user.get("email")},
+            }
 
         except NotFoundError:
             raise
