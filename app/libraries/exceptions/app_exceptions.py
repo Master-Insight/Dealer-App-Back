@@ -48,3 +48,17 @@ class NotFoundError(AppError):
 
     def __init__(self, message="Recurso no encontrado", details=None):
         super().__init__(message, status_code=404, details=details)
+
+
+class DataAccessError(AppError):
+    """Error relacionado con la comunicación con la base de datos."""
+
+    def __init__(self, message="Error de acceso a datos", details=None):
+        super().__init__(message, status_code=500, details=details)
+
+
+class ServiceError(AppError):
+    """Error genérico para la capa de servicios."""
+
+    def __init__(self, message="Error interno del servicio", details=None):
+        super().__init__(message, status_code=500, details=details)
