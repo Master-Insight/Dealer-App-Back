@@ -1,12 +1,13 @@
 # app/modules/users/api/schemas.py
-from enum import Enum
-from typing import List, Optional, Union
-from pydantic import BaseModel, EmailStr
 from datetime import datetime
+from enum import Enum
+from typing import Optional
+
+from pydantic import BaseModel, EmailStr
 
 
 class RoleEnum(str, Enum):
-    code = "code"
+    root = "root"
     admin = "admin"
     user = "user"
 
@@ -18,7 +19,6 @@ class UserLogin(BaseModel):
 
 class UserBase(BaseModel):
     email: EmailStr
-    # role: Optional[RoleEnum] = RoleEnum.user
 
 
 class UserCreate(UserBase):
@@ -27,13 +27,26 @@ class UserCreate(UserBase):
 
 class User(UserBase):
     id: str
-    created_at: datetime
+    role: Optional[RoleEnum] = None
+    created_at: Optional[datetime] = None
 
     class Config:
         from_attributes = True
 
 
-class ResponseModel(BaseModel):
-    success: bool
-    message: str
-    data: Optional[Union[User, List[User], dict, str]] = None
+class LoginResponse(BaseModel):
+    token: str
+    profile: Optional[User] = None
+
+
+class LogoutResponse(BaseModel):
+    status: str
+
+
+class UserSummary(BaseModel):
+    id: str
+    email: EmailStr
+
+
+class DeleteUserResponse(BaseModel):
+    user: Optional[UserSummary] = None

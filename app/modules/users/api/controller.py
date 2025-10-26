@@ -1,4 +1,4 @@
-# app/modules/s/api/controller.py
+# app/modules/users/api/controller.py
 from app.libraries.utils.response_builder import ResponseBuilder
 from .schemas import UserCreate
 from ..logic.services import UserService
@@ -36,5 +36,5 @@ class UserController:
 
     def delete_user(self, id: str):
         result = self.service.delete_user(id)
-        message = result.get("message", "Usuario eliminado correctamente")
+        message = result.get("message", f"Usuario {id} eliminado correctamente")
         return ResponseBuilder.success(result, message)
