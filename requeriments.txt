@@ -4,6 +4,9 @@ uvicorn[standard]
 python-dotenv
 pydantic-settings
 
+# services
+resend
+
 # Data & DB
 supabase
 pandas
