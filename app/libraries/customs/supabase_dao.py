@@ -20,38 +20,42 @@ class CustomSupabaseDAO:
                 raise Exception(response.error.message)
             return response.data
         except Exception as e:
-            raise Exception(f"[SupabaseDAO:{self.table_name}] Error en '{action}': {str(e)}")
+            raise Exception(
+                f"[SupabaseDAO:{self.table_name}] Error en '{action}': {str(e)}"
+            )
 
     # --- Métodos CRUD reutilizables ---
     def get_all(self):
         """Obtiene todos los registros de la tabla."""
-        response = self.table.select("*").execute()
-        return response.data
+        query = self.table.select("*")
+        return self._execute(query, "get_all")
 
     def get_by_id(self, record_id: int):
         """Obtiene un registro por su ID."""
-        response = self.table.select("*").eq("id", record_id).execute()
-        return response.data[0] if response.data else None
+        query = self.table.select("*").eq("id", record_id)
+        data = self._execute(query, "get_by_id")
+        return data[0] if data else None
 
-    def insert(self, data: dict):
-        """Inserta un nuevo registro."""
-        response = self.table.insert(data).execute()
-        return response.data
+    def insert(self, payload: dict):
+        """Inserta un nuevo registro y devuelve el registro creado."""
+        query = self.table.insert(payload)
+        data = self._execute(query, "insert")
+        return data[0] if data else None
 
-    def update(self, record_id: int, data: dict):
+    def update(self, record_id: int, payload: dict):
         """Actualiza un registro existente por ID."""
-        response = self.table.update(data).eq("id", record_id).execute()
-        return response.data
+        query = self.table.update(payload).eq("id", record_id)
+        data = self._execute(query, "update")
+        return data[0] if data else None
 
     def delete(self, record_id: int):
         """Elimina un registro por ID."""
-        response = self.table.delete().eq("id", record_id).execute()
-        return response.data
+        query = self.table.delete().eq("id", record_id)
+        return self._execute(query, "delete")
 
     def filter(self, **filters):
         """Filtra registros por uno o más campos (dinámico)."""
         query = self.table.select("*")
         for key, value in filters.items():
             query = query.eq(key, value)
-        response = query.execute()
-        return response.data
+        return self._execute(query, "filter")
