@@ -68,14 +68,30 @@ class UserService:
         created = self.dao.create_profile(new_profile)
         return created
 
+    def login(self, email: str, password: str):
+        try:
+            auth_user = supabase.auth.sign_in_with_password(
+                {"email": email, "password": password}
+            )
+
+            if not auth_user.user:
+                raise AuthError("Credenciales inválidas")
+
+            profile = self.dao.get_by_email(email)
+            return {
+                "token": auth_user.session.access_token,
+                "profile": profile,
+            }
+
+        except Exception:
+            raise AuthError("Credenciales inválidas")
+
     def list_users(self):
         return self.dao.get_all()
 
     def get_user(self, user_id: str):
-        user = supabase.table("users").select("*").eq("id", user_id).execute()
-        if not user.data:
-            raise NotFoundError(f"Usuario con id {user_id} no encontrado")
-        return user.data[0]
+        user = self.dao.get_by_id(user_id)
+        return user
 
     def delete_user(self, user_id: str):
         try:
