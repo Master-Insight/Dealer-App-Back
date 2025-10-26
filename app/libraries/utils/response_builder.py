@@ -1,25 +1,23 @@
 # app/libraries/utils/response_builder.py
-from typing import Any, Optional, Dict
+from typing import Optional, TypeVar
 from fastapi import HTTPException
+
+from app.libraries.utils.response_models import ApiResponse, ErrorResponse
+
+T = TypeVar("T")
 
 
 class ResponseBuilder:
     """Utilidad para estandarizar respuestas de la API."""
 
     @staticmethod
-    def success(data: Any = None, message: str = "Operación exitosa") -> Dict:
-        return {
-            "success": True,
-            "message": message,
-            "data": data,
-        }
+    def success(
+        data: Optional[T] = None, message: str = "Operación exitosa"
+    ) -> ApiResponse[Optional[T]]:
+        return ApiResponse[Optional[T]](message=message, data=data)
 
     @staticmethod
-    def error(error: str, details: Optional[Any] = None, status_code: int = 400):
+    def error(error: str, details: Optional[T] = None, status_code: int = 400):
         """Lanza una HTTPException con formato normalizado."""
-        content = {
-            "success": False,
-            "error": error,
-            "details": details,
-        }
-        raise HTTPException(status_code=status_code, detail=content)
+        content = ErrorResponse(error=error, details=details)
+        raise HTTPException(status_code=status_code, detail=content.dict())
