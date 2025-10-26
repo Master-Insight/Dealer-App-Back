@@ -11,6 +11,7 @@ class ProductController(ResponseController[Product, ProductCreate]):
     def __init__(self):
         super().__init__(ProductService())
 
-    def create(self, data):
-        """Crea un nuevo registro."""
-        return ResponseBuilder.success("creado")
+    def create(self, data: ProductCreate):
+        """Crea un nuevo producto en la base de datos."""
+        created_product = self.service.create(data.dict())
+        return ResponseBuilder.success(created_product, "Producto creado correctamente")
