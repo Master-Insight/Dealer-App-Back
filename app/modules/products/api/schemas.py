@@ -1,8 +1,9 @@
 # app/modules/products/api/schemas.py
-from typing import List, Optional, Union
-from enum import Enum
-from pydantic import BaseModel
 from datetime import datetime
+from enum import Enum
+from typing import List, Optional, Union
+
+from pydantic import BaseModel
 
 
 class ProductState(str, Enum):
