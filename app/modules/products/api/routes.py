@@ -1,6 +1,8 @@
 # app/modules/products/api/routes.py
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from typing import List
+
+from app.libraries.auth.roles import require_role
 from .controller import ProductController
 from .schemas import ResponseModel, ProductCreate
 
@@ -21,5 +23,7 @@ def get_product(product_id: int):
 
 
 @router.post("/", response_model=ResponseModel)
-def create_product(product: ProductCreate):
+def create_product(
+    product: ProductCreate, current_user=Depends(require_role(["admin", "root"]))
+):
     return controller.create(product)

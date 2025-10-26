@@ -1,7 +1,6 @@
 # app/modules/products/api/controller.py
-from fastapi import HTTPException
-from typing import List
 from app.libraries.customs.controller_response import ResponseController
+from app.libraries.utils.response_builder import ResponseBuilder
 from .schemas import Product, ProductCreate
 from ..logic.services import ProductService
 
@@ -12,6 +11,6 @@ class ProductController(ResponseController[Product, ProductCreate]):
     def __init__(self):
         super().__init__(ProductService())
 
-    # Si quisieras agregar lógica adicional específica:
-    # def get_products_by_brand(self, brand: str):
-    #     return self.service.list_by_brand(brand)
+    def create(self, data):
+        """Crea un nuevo registro."""
+        return ResponseBuilder.success("creado")

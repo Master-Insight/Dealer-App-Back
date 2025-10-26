@@ -103,6 +103,10 @@ class UserService:
         user = self.dao.get_by_id(user_id)
         return user
 
+    def get_user_by_email(self, email: str):
+        user = self.dao.get_by_email(email)
+        return user
+
     def delete_user(self, user_id: str):
         try:
             # 1️⃣ Verificar si el usuario existe en tu tabla

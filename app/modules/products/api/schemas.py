@@ -43,7 +43,7 @@ class ProductBase(BaseModel):
     location: Optional[str] = None
     state: Optional[ProductState] = None
     description: Optional[str] = None
-    active: bool
+    active: Optional[bool] = False
     photos_url: Optional[List[str]] = None
     price: Optional[float] = None
     labels: Optional[List[str]] = None
