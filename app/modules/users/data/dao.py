@@ -1,31 +1,25 @@
 # app/modules/users/data/dao.py
-from app.services.supabase_client import supabase
+"""DAO específico para usuarios usando Supabase."""
+
+from __future__ import annotations
+
+from app.libraries.customs.supabase_dao import CustomSupabaseDAO
 
 
-class UserDAO:
+class UserDAO(CustomSupabaseDAO):
     """Capa de acceso a datos de usuarios."""
 
     def __init__(self):
-        self.table = supabase.table("user_profiles")
-
-    def get_all(self):
-        return self.table.select("*").execute().data
-
-    def get_by_id(self, user_id: str):
-        res = self.table.select("*").eq("id", user_id).execute()
-        return res.data[0] if res.data else None
+        super().__init__("user_profiles")
 
     def get_by_email(self, email: str):
-        res = self.table.select("*").eq("email", email).execute()
-        return res.data[0] if res.data else None
+        return self.get_first(email=email)
 
     def create_profile(self, user_data: dict):
-        return self.table.insert(user_data).execute().data[0]
+        return self.insert(user_data)
 
     def update_role_by_email(self, email: str, role: str):
-        return (
-            self.table.update({"role": role}).eq("email", email).single().execute().data
-        )
+        return self.update_where({"email": email}, {"role": role})
 
     def delete_profile(self, user_id: str):
-        return self.table.delete().eq("id", user_id).execute()
+        return super().delete(user_id)
