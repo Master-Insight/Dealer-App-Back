@@ -1,7 +1,5 @@
 # app/libraries/customs/controller_base.py
-from fastapi import HTTPException
-from typing import TypeVar, Generic, List, Optional, Any, Dict, Type
-
+from typing import TypeVar, Generic, Any, Dict
 from app.libraries.utils.response_builder import ResponseBuilder
 
 T = TypeVar("T")  # Modelo de salida (por ejemplo, Product)
@@ -17,37 +15,31 @@ class ResponseController(Generic[T, C]):
     def __init__(self, service: Any):
         self.service = service
 
-    def list_all(self) -> List[T]:
+    def list_all(self) -> Dict[str, Any]:
         """Obtiene todos los registros."""
         return ResponseBuilder.success(self.service.list_all())
 
-    def get_by_id(self, item_id: int) -> Optional[T]:
+    def get_by_id(self, item_id: int) -> Dict[str, Any]:
         """Obtiene un registro por ID."""
         item = self.service.get_by_id(item_id)
-        if not item:
-            raise HTTPException(
-                status_code=404, detail=f"Registro con ID {item_id} no encontrado"
-            )
         return ResponseBuilder.success(item)
 
     def create(self, data: C) -> T:
         """Crea un nuevo registro."""
-        return ResponseBuilder.success(self.service.create(data.dict()))
+        created = self.service.create(data.dict())
+        return ResponseBuilder.success(created, "Registro creado correctamente")
 
-    def update(self, item_id: int, data: Dict[str, Any]) -> T:
+    def update(self, item_id: int, data: Dict[str, Any]) -> Dict[str, Any]:
         """Actualiza un registro existente."""
         updated = self.service.update(item_id, data)
-        if not updated:
-            raise HTTPException(
-                status_code=404, detail=f"Registro con ID {item_id} no encontrado"
-            )
-        return ResponseBuilder.success(updated)
+        return ResponseBuilder.success(updated, "Registro actualizado correctamente")
 
     def delete(self, item_id: int) -> Dict[str, Any]:
         """Elimina un registro."""
-        success = self.service.delete(item_id)
-        if not success:
-            raise HTTPException(
-                status_code=404, detail=f"Registro con ID {item_id} no encontrado"
-            )
-        return ResponseBuilder.success(f"Registro {item_id} eliminado correctamente")
+        result = self.service.delete(item_id)
+        message = (
+            result.get("message")
+            if isinstance(result, dict)
+            else f"Registro {item_id} eliminado correctamente"
+        )
+        return ResponseBuilder.success(result, message)
