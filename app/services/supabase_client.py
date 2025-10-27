@@ -1,5 +1,8 @@
 # app/services/supabase_client.py
-from supabase import create_client, Client
+"""Singleton del cliente de Supabase usado en toda la aplicación."""
+
+from supabase import Client, create_client
+
 from app.config.settings import settings
 
 url: str = settings.SUPABASE_URL
