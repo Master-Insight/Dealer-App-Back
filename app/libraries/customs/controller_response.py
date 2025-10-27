@@ -28,12 +28,20 @@ class ResponseController(Generic[T, C]):
 
     def create(self, data: C) -> ApiResponse[Any]:
         """Crea un nuevo registro."""
-        created = self.service.create(data.dict())
+        payload = (
+            data.model_dump(exclude_unset=True)
+            if hasattr(data, "model_dump")
+            else data.dict()
+        )
+        created = self.service.create(payload)
         return ResponseBuilder.success(created, "Registro creado correctamente")
 
     def update(self, item_id: int, data: Any) -> ApiResponse[Any]:
         """Actualiza un registro existente."""
-        updated = self.service.update(item_id, data)
+        payload = (
+            data.model_dump(exclude_unset=True) if hasattr(data, "model_dump") else data
+        )
+        updated = self.service.update(item_id, payload)
         return ResponseBuilder.success(updated, "Registro actualizado correctamente")
 
     def delete(self, item_id: int) -> ApiResponse[Any]:
