@@ -30,8 +30,16 @@ class UserController:
     # TODO en caso de usar un role distinto  a "user" deberia confirmar medidas de seguridad para limitar acción
     def register_user(self, user: UserCreate):
         profile = self.service.register_user(
-            user.email, user.password
-        )  # se quita x seguridad -->, user.role
+            email=user.email,
+            password=user.password,
+            role=user.role.value,
+            profile_data={
+                "company_id": user.company_id,
+                "full_name": user.full_name,
+                "phone": user.phone,
+                "active": user.active,
+            },
+        )
         return ResponseBuilder.success(profile, "Usuario registrado correctamente")
 
     def delete_user(self, id: str):

@@ -18,6 +18,9 @@ class UserDAO(CustomSupabaseDAO):
     def create_profile(self, user_data: dict):
         return self.insert(user_data)
 
+    def update_profile(self, user_id: str, data: dict):
+        return self.update(user_id, data)
+
     def update_role_by_email(self, email: str, role: str):
         return self.update_where({"email": email}, {"role": role})
 

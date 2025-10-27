@@ -3,7 +3,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Optional
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 
 
 class RoleEnum(str, Enum):
@@ -19,6 +19,12 @@ class UserLogin(BaseModel):
 
 class UserBase(BaseModel):
     email: EmailStr
+    company_id: Optional[str] = Field(
+        default=None, description="Empresa a la que pertenece el usuario"
+    )
+    full_name: Optional[str] = Field(default=None, description="Nombre completo")
+    phone: Optional[str] = Field(default=None, description="Teléfono de contacto")
+    active: bool = Field(default=True, description="Estado de la cuenta")
 
 
 class UserCreate(UserBase):
@@ -27,7 +33,7 @@ class UserCreate(UserBase):
 
 class User(UserBase):
     id: str
-    role: Optional[RoleEnum] = None
+    role: Optional[RoleEnum] = RoleEnum.user
     created_at: Optional[datetime] = None
 
     class Config:
@@ -36,7 +42,7 @@ class User(UserBase):
 
 class LoginResponse(BaseModel):
     token: str
-    profile: Optional[User] = None
+    profile: Optional[User] = RoleEnum.user
 
 
 class LogoutResponse(BaseModel):
