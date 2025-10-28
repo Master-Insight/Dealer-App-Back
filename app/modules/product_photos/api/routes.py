@@ -19,13 +19,13 @@ controller = ProductPhotoController()
 
 # TODO falta quitar el array de fotos de Product
 @router.get("/{product_id}/photos", response_model=ApiResponse[List[ProductPhoto]])
-def list_photos(product_id: int, current_user=Depends(require_role(["root", "admin"]))):
+def list_photos(product_id: str, current_user=Depends(require_role(["root", "admin"]))):
     return controller.list_photos(product_id)
 
 
 @router.post("/{product_id}/photos", response_model=ApiResponse[ProductPhoto])
 def create_photo(
-    product_id: int,
+    product_id: str,
     payload: ProductPhotoCreate,
     current_user=Depends(require_role(["root", "admin"])),
 ):

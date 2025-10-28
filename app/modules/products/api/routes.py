@@ -18,7 +18,7 @@ def get_products():
 
 
 @router.get("/{product_id}", response_model=ApiResponse[Product])
-def get_product(product_id: int):
+def get_product(product_id: str):
     """Obtiene un producto por ID"""
     return controller.get_by_id(product_id)
 
