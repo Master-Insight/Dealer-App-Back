@@ -3,7 +3,7 @@ from datetime import datetime
 from enum import Enum
 from typing import List, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class ProductState(str, Enum):
@@ -56,7 +56,7 @@ class ProductCreate(ProductBase):
 
 
 class Product(ProductBase):
-    id: int
+    id: str
     created_at: datetime
     update: Optional[datetime] = None
 

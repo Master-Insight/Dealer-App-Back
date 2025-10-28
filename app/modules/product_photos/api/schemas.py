@@ -10,7 +10,7 @@ from pydantic import AnyUrl, BaseModel, Field
 
 
 class ProductPhotoBase(BaseModel):
-    product_id: int = Field(..., description="Producto al que pertenece la foto")
+    product_id: str = Field(..., description="Producto al que pertenece la foto")
     url: AnyUrl = Field(..., description="URL pública de la imagen")
     order: int = Field(default=0, description="Orden de visualización")
 

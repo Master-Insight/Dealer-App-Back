@@ -22,7 +22,7 @@ class DealBase(BaseModel):
     company_id: str = Field(..., description="Empresa dueña de la gestión")
     advisor_id: Optional[str] = Field(None, description="Usuario responsable")
     client_id: str = Field(..., description="Cliente asociado")
-    product_id: Optional[int] = Field(
+    product_id: Optional[str] = Field(
         default=None, description="Producto asociado (opcional)"
     )
     scheduled_for: Optional[datetime] = Field(
@@ -39,7 +39,7 @@ class DealCreate(DealBase):
 class DealUpdate(BaseModel):
     advisor_id: Optional[str] = None
     client_id: Optional[str] = None
-    product_id: Optional[int] = None
+    product_id: Optional[str] = None
     scheduled_for: Optional[datetime] = None
     status: Optional[DealStatus] = None
     notes: Optional[str] = None
