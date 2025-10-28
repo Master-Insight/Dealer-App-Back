@@ -7,9 +7,10 @@ from pydantic import BaseModel, Field
 
 
 class ProductState(str, Enum):
-    usado = "Usado"
-    nuevo = "Nuevo"
-    areparar = "A reparar"
+    disponible = "Fisponible"
+    reservado = "Reservado"
+    vendido = "Vendido"
+    baja = "Baja"
 
 
 class ProductFuelType(str, Enum):
@@ -32,6 +33,7 @@ class ProductTypes(str, Enum):
 
 
 class ProductBase(BaseModel):
+    company_id: str = Field(..., description="Empresa dueña del vehículo")
     brand: str
     model: str
     variant: Optional[str] = None
@@ -42,7 +44,10 @@ class ProductBase(BaseModel):
     color: Optional[str] = None
     doors: Optional[int] = None
     location: Optional[str] = None
-    state: Optional[ProductState] = None
+    state: Optional[ProductState] = Field(
+        default=ProductState.disponible,
+        description="Estado comercial del vehículo",
+    )
     description: Optional[str] = None
     active: Optional[bool] = False
     photos_url: Optional[List[str]] = None
@@ -55,9 +60,16 @@ class ProductCreate(ProductBase):
     pass
 
 
+class ProductUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    price: Optional[float] = None
+    status: Optional[ProductState] = None
+
+
 class Product(ProductBase):
     id: str
-    created_at: datetime
+    created_at: Optional[datetime] = None
     update: Optional[datetime] = None
 
     class Config:
