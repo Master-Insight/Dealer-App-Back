@@ -14,7 +14,9 @@ class ClientBase(BaseModel):
         default=None, description="Empresa asociada al cliente"
     )
     name: str = Field(..., description="Nombre completo del cliente")
-    phone: str = Field(..., description="Teléfono principal del cliente")
+    phone: Optional[str] = Field(
+        default=None, description="Teléfono principal del cliente"
+    )
     email: Optional[EmailStr] = Field(default=None, description="Correo de contacto")
     dni: Optional[str] = Field(default=None, description="Documento de identidad")
 
