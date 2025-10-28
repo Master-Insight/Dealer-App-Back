@@ -3,7 +3,7 @@
 
 from __future__ import annotations
 
-from typing import Dict
+from typing import Any, Dict
 
 from app.libraries.customs.base_service import BaseService
 
@@ -17,5 +17,5 @@ class ProductPhotoService(BaseService):
     def list_for_product(self, product_id: str):
         return self.dao.list_for_product(product_id)
 
-    def create_photo(self, data: Dict):
+    def create_photo(self, data: Dict[str, Any]):
         return self.create(data)

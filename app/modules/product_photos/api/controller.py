@@ -3,6 +3,8 @@
 
 from __future__ import annotations
 
+from typing import Any, Dict
+
 from app.libraries.utils.response_builder import ResponseBuilder
 
 from ..logic.services import ProductPhotoService
@@ -17,8 +19,14 @@ class ProductPhotoController:
         data = self.service.list_for_product(product_id)
         return ResponseBuilder.success(data, "Fotos obtenidas correctamente")
 
-    def create_photo(self, payload: ProductPhotoCreate):
-        data = self.service.create_photo(payload)
+    def create_photo(self, payload: ProductPhotoCreate | Dict[str, Any]):
+        payload_dict: Dict[str, Any]
+        if isinstance(payload, dict):
+            payload_dict = payload
+        else:
+            payload_dict = payload.model_dump(mode="json", exclude_unset=True)
+
+        data = self.service.create_photo(payload_dict)
         return ResponseBuilder.success(data, "Foto agregada correctamente")
 
     def delete_photo(self, photo_id: str):

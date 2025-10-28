@@ -7,10 +7,10 @@ from pydantic import BaseModel, Field
 
 
 class ProductState(str, Enum):
-    disponible = "Fisponible"
-    reservado = "Reservado"
-    vendido = "Vendido"
-    baja = "Baja"
+    disponible = "disponible"
+    reservado = "reservado"
+    vendido = "vendido"
+    baja = "baja"
 
 
 class ProductFuelType(str, Enum):
@@ -49,8 +49,10 @@ class ProductBase(BaseModel):
         description="Estado comercial del vehículo",
     )
     description: Optional[str] = None
-    active: Optional[bool] = False
-    photos_url: Optional[List[str]] = None
+    active: Optional[bool] = Field(
+        default=True,
+        description="Permite desactivar el vehículo sin eliminarlo",
+    )
     price: Optional[float] = None
     labels: Optional[List[str]] = None
     vehicle_type: Optional[ProductTypes] = None
@@ -61,16 +63,29 @@ class ProductCreate(ProductBase):
 
 
 class ProductUpdate(BaseModel):
-    name: Optional[str] = None
+    company_id: Optional[str] = None
+    brand: Optional[str] = None
+    model: Optional[str] = None
+    variant: Optional[str] = None
+    year: Optional[int] = None
+    mileage: Optional[int] = None
+    fuel_type: Optional[ProductFuelType] = None
+    transmission: Optional[ProductTransmision] = None
+    color: Optional[str] = None
+    doors: Optional[int] = None
+    location: Optional[str] = None
+    state: Optional[ProductState] = None
     description: Optional[str] = None
     price: Optional[float] = None
-    status: Optional[ProductState] = None
+    active: Optional[bool] = None
+    labels: Optional[List[str]] = None
+    vehicle_type: Optional[ProductTypes] = None
 
 
 class Product(ProductBase):
     id: str
     created_at: Optional[datetime] = None
-    update: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
 
     class Config:
         from_attributes = True
