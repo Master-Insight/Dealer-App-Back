@@ -15,7 +15,7 @@ class ClientDAO(CustomSupabaseDAO):
     def search(self, *, company_id: str, term: str):
         """Búsqueda simple por email, teléfono o DNI."""
 
-        query = self.table.select("*").eq("company_id", company_id)
+        query = self._build_select_query().eq("company_id", company_id)
         query = query.or_(
             f"email.ilike.%{term}%,phone.ilike.%{term}%,dni.ilike.%{term}%"
         )

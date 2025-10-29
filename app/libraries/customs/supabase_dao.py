@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Any, Dict
+from typing import Any, Dict, Optional, Sequence, Union
 
 from postgrest.exceptions import APIError
 
@@ -10,6 +10,8 @@ from app.libraries.exceptions.app_exceptions import DataAccessError
 from app.services.supabase_client import supabase
 
 logger = logging.getLogger(__name__)
+
+SelectColumns = Union[str, Sequence[str]]
 
 
 class CustomSupabaseDAO:
@@ -68,15 +70,41 @@ class CustomSupabaseDAO:
             return data[0] if data else None
         return data
 
+    @staticmethod
+    def _normalize_columns(columns: Optional[SelectColumns] = None) -> str:
+        if columns is None:
+            return "*"
+        if isinstance(columns, str):
+            return columns
+        # Sequence[str] puede incluir tuplas o listas de nombres de columnas.
+        return ",".join(columns)
+
+    def _build_select_query(self, columns: Optional[SelectColumns] = None):
+        selection = self._normalize_columns(columns)
+        return self.table.select(selection)
+
+    @staticmethod
+    def _apply_filters(query, filters: Dict[str, Any]):
+        for key, value in filters.items():
+            if value is None:
+                continue
+            query = query.eq(key, value)
+        return query
+
     # --- Métodos CRUD reutilizables ---
-    def get_all(self):
+    def get_all(self, *, columns: Optional[SelectColumns] = None):
         """Obtiene todos los registros de la tabla."""
-        query = self.table.select("*")
+        query = self._build_select_query(columns)
         return self._execute(query, "get_all")
 
-    def get_by_id(self, record_id: Any):
+    def get_by_id(
+        self,
+        record_id: Any,
+        *,
+        columns: Optional[SelectColumns] = None,
+    ):
         """Obtiene un registro por su ID."""
-        query = self.table.select("*").eq("id", record_id)
+        query = self._build_select_query(columns).eq("id", record_id)
         data = self._execute(query, "get_by_id")
         return data[0] if data else None
 
@@ -100,12 +128,25 @@ class CustomSupabaseDAO:
             return len(data) > 0
         return bool(data)
 
-    def filter(self, **filters):
+    def filter(
+        self,
+        *,
+        columns: Optional[SelectColumns] = None,
+        **filters,
+    ):
         """Filtra registros por uno o más campos (dinámico)."""
-        query = self.table.select("*")
-        for key, value in filters.items():
-            query = query.eq(key, value)
+        query = self._build_select_query(columns)
+        query = self._apply_filters(query, filters)
         return self._execute(query, "filter")
+
+    def filter_by(
+        self,
+        filters: Dict[str, Any],
+        *,
+        columns: Optional[SelectColumns] = None,
+    ):
+        """Filtra registros usando un diccionario de filtros dinámicos."""
+        return self.filter(columns=columns, **filters)
 
     def get_first(self, **filters):
         """Obtiene el primer registro que coincide con los filtros dados."""
@@ -115,7 +156,6 @@ class CustomSupabaseDAO:
     def update_where(self, filters: Dict[str, Any], payload: dict):
         """Actualiza registros que cumplen los filtros y retorna el primero."""
         query = self.table.update(payload)
-        for key, value in filters.items():
-            query = query.eq(key, value)
+        query = self._apply_filters(query, filters)
         data = self._execute(query, "update_where")
         return self._extract_single(data)
