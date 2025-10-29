@@ -22,4 +22,5 @@ class DealNoteService(BaseService):
             data["user_id"] = profile.get("id")
 
         data["deal_id"] = deal_id
-        return self.create(data)
+        metadata = {"deal_id": deal_id}
+        return self.create(data, audit_metadata=metadata)

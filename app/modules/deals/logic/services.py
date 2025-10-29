@@ -56,7 +56,12 @@ class DealService(BaseService):
         if not data.get("company_id"):
             raise ValidationError("Debe indicar una empresa para la gestión")
 
-        return self.create(data)
+        metadata = {
+            "company_id": data.get("company_id"),
+            "client_id": data.get("client_id"),
+            "advisor_id": data.get("advisor_id"),
+        }
+        return self.create(data, audit_metadata=metadata)
 
     def update_deal(self, profile: Dict, deal_id: str, data: Dict):
         deal = self.dao.get_by_id(deal_id)
@@ -68,7 +73,12 @@ class DealService(BaseService):
         ):
             raise AuthError("No puedes modificar esta gestión")
 
-        return self.update(deal_id, data)
+        metadata = {
+            "company_id": deal.get("company_id"),
+            "client_id": deal.get("client_id"),
+            "advisor_id": deal.get("advisor_id"),
+        }
+        return self.update(deal_id, data, audit_metadata=metadata)
 
     def delete_deal(self, profile: Dict, deal_id: str):
         deal = self.dao.get_by_id(deal_id)
@@ -80,7 +90,12 @@ class DealService(BaseService):
         ):
             raise AuthError("No puedes eliminar esta gestión")
 
-        return self.delete(deal_id)
+        metadata = {
+            "company_id": deal.get("company_id"),
+            "client_id": deal.get("client_id"),
+            "advisor_id": deal.get("advisor_id"),
+        }
+        return self.delete(deal_id, audit_metadata=metadata)
 
     def send_confirmation_email(
         self, *, deal: Dict, to_email: str, subject: str, message: Optional[str]

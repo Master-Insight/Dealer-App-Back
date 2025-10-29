@@ -78,7 +78,12 @@ class QuotationService(BaseService):
         if amount is None or float(amount) <= 0:
             raise ValidationError("El monto de la cotización debe ser mayor a cero")
 
-        return self.create(data)
+        metadata = {
+            "company_id": target_company,
+            "deal_id": data.get("deal_id"),
+            "product_id": data.get("product_id"),
+        }
+        return self.create(data, audit_metadata=metadata)
 
     def update_quotation(self, profile: Dict, quotation_id: str, data: Dict):
         quotation = self.dao.get_by_id(quotation_id)
@@ -102,7 +107,12 @@ class QuotationService(BaseService):
         ):
             raise ValidationError("El monto debe ser mayor a cero")
 
-        return self.update(quotation_id, data)
+        metadata = {
+            "company_id": quotation.get("company_id"),
+            "deal_id": quotation.get("deal_id"),
+            "product_id": quotation.get("product_id"),
+        }
+        return self.update(quotation_id, data, audit_metadata=metadata)
 
     def delete_quotation(self, profile: Dict, quotation_id: str):
         quotation = self.dao.get_by_id(quotation_id)
@@ -117,4 +127,9 @@ class QuotationService(BaseService):
         ) != profile.get("company_id"):
             raise AuthError("No puedes eliminar cotizaciones de otra empresa")
 
-        return self.delete(quotation_id)
+        metadata = {
+            "company_id": quotation.get("company_id"),
+            "deal_id": quotation.get("deal_id"),
+            "product_id": quotation.get("product_id"),
+        }
+        return self.delete(quotation_id, audit_metadata=metadata)

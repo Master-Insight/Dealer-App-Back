@@ -18,4 +18,8 @@ class ProductPhotoService(BaseService):
         return self.dao.list_for_product(product_id)
 
     def create_photo(self, data: Dict[str, Any]):
-        return self.create(data)
+        metadata = {
+            "product_id": data.get("product_id"),
+            "is_cover": data.get("is_cover"),
+        }
+        return self.create(data, audit_metadata=metadata)

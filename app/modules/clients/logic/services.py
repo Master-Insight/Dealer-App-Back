@@ -43,7 +43,8 @@ class ClientService(BaseService):
             raise ValidationError("Debe especificar una compañía para el cliente")
 
         data["company_id"] = target_company
-        return self.create(data)
+        metadata = {"company_id": target_company}
+        return self.create(data, audit_metadata=metadata)
 
     def update_client(self, profile: Dict, client_id: str, data: Dict):
         client = self.dao.get_by_id(client_id)
@@ -55,7 +56,8 @@ class ClientService(BaseService):
         ):
             raise AuthError("No puedes editar clientes de otra empresa")
 
-        return self.update(client_id, data)
+        metadata = {"company_id": client.get("company_id")}
+        return self.update(client_id, data, audit_metadata=metadata)
 
     def delete_client(self, profile: Dict, client_id: str):
         client = self.dao.get_by_id(client_id)
@@ -67,4 +69,5 @@ class ClientService(BaseService):
         ):
             raise AuthError("No puedes eliminar clientes de otra empresa")
 
-        return self.delete(client_id)
+        metadata = {"company_id": client.get("company_id")}
+        return self.delete(client_id, audit_metadata=metadata)

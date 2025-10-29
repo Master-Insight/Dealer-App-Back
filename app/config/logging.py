@@ -105,6 +105,18 @@ def clear_logging_context() -> None:
     _user_id_ctx.set("-")
 
 
+def get_request_id() -> str:
+    """Obtiene el identificador de petición activo."""
+
+    return _request_id_ctx.get()
+
+
+def get_user_id() -> str:
+    """Obtiene el identificador de usuario asociado al contexto actual."""
+
+    return _user_id_ctx.get()
+
+
 def _build_handlers(formatter: str, filters: Iterable[str]) -> Dict[str, Any]:
     handlers: Dict[str, Any] = {
         "console": {

@@ -80,9 +80,6 @@ class UserService(BaseService):
         if profile:
             # 2a) Si el perfil existe, asegurar el role (idempotente)
             current_role = profile.get("role")
-            if current_role != role:
-                updated = self.dao.update_role_by_email(email, role)
-                profile = updated or profile
 
             updates = {
                 key: value
@@ -90,8 +87,18 @@ class UserService(BaseService):
                 if value is not None
             }
 
+            metadata = {"email": email}
+            if current_role != role:
+                updates["role"] = role
+                metadata["previous_role"] = current_role
+                metadata["role"] = role
+
             if updates:
-                profile = self.dao.update_profile(profile.get("id"), updates) or profile
+                profile = self.update(
+                    profile.get("id"),
+                    updates,
+                    audit_metadata=metadata,
+                )
             return profile
 
         # 3) Si NO existe perfil (trigger falló), lo creamos manualmente
@@ -104,7 +111,8 @@ class UserService(BaseService):
             if value is not None:
                 new_profile[key] = value
 
-        created = self.dao.create_profile(new_profile)
+        metadata = {"email": email, "role": role}
+        created = self.create(new_profile, audit_metadata=metadata)
         return created
 
     def login(self, email: str, password: str):
@@ -168,9 +176,7 @@ class UserService(BaseService):
                     raise AuthError("No puedes eliminar usuarios root")
 
             # 2️⃣ Eliminar perfil en tu base de datos
-            deleted = self.dao.delete_profile(user_id)
-            if not deleted:
-                raise NotFoundError(f"Usuario con id {user_id} no encontrado")
+            self.delete(user_id, audit_metadata={"email": user.get("email")})
 
             # 3️⃣ Eliminar usuario en Supabase Auth (requiere Service Role Key)
             self.auth_gateway.delete_user(user_id)
