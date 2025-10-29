@@ -29,6 +29,7 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     password: str
+    role: RoleEnum = RoleEnum.user
 
 
 class User(UserBase):
@@ -42,7 +43,7 @@ class User(UserBase):
 
 class LoginResponse(BaseModel):
     token: str
-    profile: Optional[User] = RoleEnum.user
+    profile: Optional[User] = None
 
 
 class LogoutResponse(BaseModel):

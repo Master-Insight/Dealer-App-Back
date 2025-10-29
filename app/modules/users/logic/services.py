@@ -1,7 +1,7 @@
 # app/modules/users/logic/services.py
 from __future__ import annotations
 
-from typing import Optional
+from typing import Dict, Optional
 
 from app.libraries.customs.base_service import BaseService
 from app.libraries.exceptions.app_exceptions import (
@@ -19,7 +19,32 @@ class UserService(BaseService):
         super().__init__(UserDAO())
         self.auth_gateway = auth_gateway or SupabaseAuthGateway()
 
-    def register_user(self, email: str, password: str, role: str = "user"):
+    def register_user(
+        self,
+        *,
+        email: str,
+        password: str,
+        role: str = "user",
+        profile_data: Optional[Dict] = None,
+        current_profile: Optional[Dict] = None,
+    ):
+        profile_data = profile_data or {}
+
+        # 0) Controles de seguridad
+        if (
+            current_profile
+            and current_profile.get("role") == "admin"
+            and role == "root"
+        ):
+            raise AuthError("Los administradores no pueden crear usuarios root")
+
+        if current_profile and current_profile.get("role") == "admin":
+            target_company = profile_data.get("company_id") or current_profile.get(
+                "company_id"
+            )
+            if target_company != current_profile.get("company_id"):
+                raise AuthError("No puedes asignar usuarios a otra empresa")
+            profile_data["company_id"] = target_company
 
         # 1) Intentar crear usuario en Auth (o confirmar existencia)
         try:
@@ -57,7 +82,16 @@ class UserService(BaseService):
             current_role = profile.get("role")
             if current_role != role:
                 updated = self.dao.update_role_by_email(email, role)
-                return updated
+                profile = updated or profile
+
+            updates = {
+                key: value
+                for key, value in (profile_data or {}).items()
+                if value is not None
+            }
+
+            if updates:
+                profile = self.dao.update_profile(profile.get("id"), updates) or profile
             return profile
 
         # 3) Si NO existe perfil (trigger falló), lo creamos manualmente
@@ -66,6 +100,10 @@ class UserService(BaseService):
             "email": email,
             "role": role,
         }
+        for key, value in profile_data.items():
+            if value is not None:
+                new_profile[key] = value
+
         created = self.dao.create_profile(new_profile)
         return created
 
@@ -95,8 +133,21 @@ class UserService(BaseService):
                 "No se pudo cerrar sesión", details={"supabase_error": error_msg}
             )
 
-    def list_users(self):
-        return self.list_all()
+    def list_users(self, *, profile: Dict, company_id: Optional[str] = None):
+        if profile.get("role") == "root" and not company_id:
+            return self.dao.get_all()
+
+        target_company = company_id or profile.get("company_id")
+
+        if not target_company:
+            raise ValidationError("Debes indicar una empresa para listar usuarios")
+
+        if profile.get("role") == "admin" and target_company != profile.get(
+            "company_id"
+        ):
+            raise AuthError("No puedes ver usuarios de otra empresa")
+
+        return self.dao.filter(company_id=target_company)
 
     def get_user(self, user_id: str):
         return self.get_by_id(user_id)
@@ -105,10 +156,16 @@ class UserService(BaseService):
         user = self.dao.get_by_email(email)
         return user
 
-    def delete_user(self, user_id: str):
+    def delete_user(self, profile: Dict, user_id: str):
         try:
             # 1️⃣ Verificar si el usuario existe en tu tabla
             user = self.get_by_id(user_id)
+
+            if profile.get("role") == "admin":
+                if user.get("company_id") != profile.get("company_id"):
+                    raise AuthError("No puedes eliminar usuarios de otra empresa")
+                if user.get("role") == "root":
+                    raise AuthError("No puedes eliminar usuarios root")
 
             # 2️⃣ Eliminar perfil en tu base de datos
             deleted = self.dao.delete_profile(user_id)
