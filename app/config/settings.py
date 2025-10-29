@@ -9,6 +9,13 @@ class Settings(BaseSettings):
     SUPABASE_URL: str
     SUPABASE_KEY: str
 
+    # --- Logging ---
+    LOG_LEVEL: str = "INFO"
+    LOG_JSON_FORMAT: bool = False
+    LOG_FILE_PATH: str | None = None
+    LOG_FILE_RETENTION: int = 7
+    ENVIRONMENT: str = "development"
+
     # --- Integraciones ---
     RESEND_API_KEY: str | None = None
 
