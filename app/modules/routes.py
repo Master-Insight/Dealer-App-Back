@@ -11,6 +11,7 @@ from app.modules.clients.api.routes import router as clients_router
 
 from app.modules.deals.api.routes import router as deals_router
 from app.modules.deal_notes.api.routes import router as deal_notes_router
+from app.modules.quotations.api.routes import router as quotations_router
 
 from app.modules.analytics.api.routes import router as analytics_router
 from app.modules.test.routes import router as test_router
@@ -34,6 +35,7 @@ def register_routes(app: FastAPI):
     # --- Rutas de módulos Combinados ---
     app.include_router(deals_router, prefix="/deals", tags=["Deals"])
     app.include_router(deal_notes_router, prefix="/deals", tags=["Deal Notes"])
+    app.include_router(quotations_router, prefix="/quotations", tags=["Quotations"])
 
     # --- Rutas de módulos Adicionales ---
     app.include_router(analytics_router, prefix="/analytics", tags=["Analytics"])
