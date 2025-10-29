@@ -11,7 +11,14 @@ from app.libraries.auth.roles import require_role
 from app.libraries.utils.response_models import ApiResponse
 
 from .controller import DealController
-from .schemas import Deal, DealCreate, DealEmailRequest, DealStatus, DealUpdate
+from .schemas import (
+    Deal,
+    DealCreate,
+    DealEmailRequest,
+    DealStatus,
+    DealUpdate,
+    DealWhatsAppRequest,
+)
 
 router = APIRouter()
 controller = DealController()
