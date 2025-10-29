@@ -1,4 +1,5 @@
 # app\modules\deals\logic\services.py
+from datetime import datetime
 from typing import Dict, Optional
 
 from app.config.settings import settings
@@ -9,13 +10,16 @@ from app.libraries.exceptions.app_exceptions import (
     ValidationError,
 )
 from app.services.email_client import email_service
+from app.services.whatsapp_client import whatsapp_service
 
 from ..data.dao import DealDAO
+from ...clients.data.dao import ClientDAO
 
 
 class DealService(BaseService):
     def __init__(self) -> None:
         super().__init__(DealDAO())
+        self.client_dao = ClientDAO()
 
     def list_deals(
         self,
@@ -93,4 +97,67 @@ class DealService(BaseService):
             to=to_email,
             subject=subject,
             html_body=html_message,
+        )
+
+    # TODO falto implementar Deals Whatsapp
+    def send_whatsapp_notification(
+        self,
+        *,
+        profile: Dict,
+        deal_id: str,
+        message: Optional[str],
+        phone: Optional[str],
+    ):
+        deal = self.dao.get_by_id(deal_id)
+        if not deal:
+            raise NotFoundError("Gestión no encontrada")
+
+        if profile.get("role") == "user" and deal.get("advisor_id") != profile.get(
+            "id"
+        ):
+            raise AuthError("No puedes notificar esta gestión")
+
+        client = None
+        if deal.get("client_id"):
+            client = self.client_dao.get_by_id(deal["client_id"])
+
+        target_phone = phone or (client.get("phone") if client else None)
+        if not target_phone:
+            raise ValidationError(
+                "No hay un teléfono configurado para notificar a este cliente"
+            )
+
+        scheduled_for = deal.get("scheduled_for")
+        scheduled_text = None
+        if scheduled_for:
+            if isinstance(scheduled_for, datetime):
+                scheduled_text = scheduled_for.strftime("%d/%m/%Y %H:%M")
+            else:
+                try:
+                    parsed = datetime.fromisoformat(str(scheduled_for).replace("Z", ""))
+                    scheduled_text = parsed.strftime("%d/%m/%Y %H:%M")
+                except ValueError:
+                    scheduled_text = str(scheduled_for)
+
+        default_message = "Hola"
+        if client and client.get("name"):
+            default_message = f"Hola {client['name']}"
+
+        default_message += ", confirmamos tu cita"
+        if scheduled_text:
+            default_message += f" para el {scheduled_text}"
+        default_message += " con nuestro equipo de Dealer App. ¡Te esperamos!"
+
+        final_message = message or default_message
+
+        metadata = {
+            "deal_id": deal_id,
+            "client_id": deal.get("client_id"),
+            "company_id": deal.get("company_id"),
+        }
+
+        return whatsapp_service.send_message(
+            to=target_phone,
+            message=final_message,
+            metadata=metadata,
         )

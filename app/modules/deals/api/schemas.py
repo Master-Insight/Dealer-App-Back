@@ -19,7 +19,9 @@ class DealStatus(str, Enum):
 
 
 class DealBase(BaseModel):
-    company_id: str = Field(..., description="Empresa dueña de la gestión")
+    company_id: Optional[str] = Field(
+        default=None, description="Empresa dueña de la gestión"
+    )
     advisor_id: Optional[str] = Field(None, description="Usuario responsable")
     client_id: str = Field(..., description="Cliente asociado")
     product_id: Optional[str] = Field(
@@ -59,4 +61,16 @@ class DealEmailRequest(BaseModel):
     message: Optional[str] = Field(
         default=None,
         description="Mensaje personalizado, si se omite se genera uno genérico",
+    )
+
+
+# TODO falto implementar Deals Whatsapp
+class DealWhatsAppRequest(BaseModel):
+    phone: Optional[str] = Field(
+        default=None,
+        description="Número de teléfono a utilizar; si se omite se usa el del cliente",
+    )
+    message: Optional[str] = Field(
+        default=None,
+        description="Mensaje personalizado para WhatsApp",
     )

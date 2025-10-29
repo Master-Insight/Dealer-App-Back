@@ -62,3 +62,13 @@ def notify_deal(
     current_user=Depends(require_role(["root", "admin"])),
 ):
     return controller.send_email(current_user, deal_id, payload)
+
+
+# TODO falto implementar Deals Whatsapp
+@router.post("/{deal_id}/whatsapp", response_model=ApiResponse[dict])
+def notify_deal_whatsapp(
+    deal_id: str,
+    payload: DealWhatsAppRequest,
+    current_user=Depends(require_role(["root", "admin", "user"])),
+):
+    return controller.send_whatsapp(current_user, deal_id, payload)

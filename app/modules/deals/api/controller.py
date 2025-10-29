@@ -8,7 +8,7 @@ from typing import Dict, Optional
 from app.libraries.utils.response_builder import ResponseBuilder
 
 from ..logic.services import DealService
-from .schemas import DealCreate, DealEmailRequest, DealUpdate
+from .schemas import DealCreate, DealEmailRequest, DealUpdate, DealWhatsAppRequest
 
 
 class DealController:
@@ -61,3 +61,13 @@ class DealController:
             message=payload.message,
         )
         return ResponseBuilder.success(result, "Notificación enviada")
+
+    # TODO falto implementar Deals Whatsapp
+    def send_whatsapp(self, profile: Dict, deal_id: str, payload: DealWhatsAppRequest):
+        result = self.service.send_whatsapp_notification(
+            profile=profile,
+            deal_id=deal_id,
+            message=payload.message,
+            phone=payload.phone,
+        )
+        return ResponseBuilder.success(result, "Mensaje de WhatsApp enviado")
