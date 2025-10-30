@@ -1,15 +1,13 @@
 # Core API
-fastapi
-uvicorn[standard]
-python-dotenv
-pydantic-settings
+fastapi>=0.110.0,<0.112.0
+uvicorn[standard]>=0.29.0,<0.31.0
+pydantic>=2.6.4,<2.8.0
+pydantic-settings>=2.2.1,<2.3.0
+python-dotenv>=1.0.1,<2.0.0
 
-# services
-resend
+# Supabase ecosystem
+supabase>=2.3.1,<3.0.0
+postgrest>=0.14.4,<0.15.0
 
-# Data & DB
-supabase
-pandas
-SQLAlchemy>=2.0
-psycopg2-binary
-openpyxl
+# Notifications
+resend>=0.9.0,<0.10.0
