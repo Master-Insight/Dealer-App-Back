@@ -45,6 +45,7 @@ def test_email(
         )
     else:
         return ResponseBuilder.error(
-            message=f"No se pudo enviar el correo a {to}",
-            data=result,
+            f"No se pudo enviar el correo a {to}",
+            details=result,
+            status_code=502,
         )
