@@ -1,6 +1,7 @@
 # app/modules/products/api/routes.py
-from fastapi import APIRouter, Depends, Query
 from typing import List, Optional
+
+from fastapi import APIRouter, Depends, Query
 
 from app.libraries.auth.roles import require_role
 from app.libraries.utils.response_models import ApiResponse
