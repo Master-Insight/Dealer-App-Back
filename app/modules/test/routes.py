@@ -18,7 +18,7 @@ def test_connection():
 
 # 01 - Prueba de envío de email con Resend
 @router.get("/email")
-def test_email(
+async def test_email(
     to: str = Query(..., description="Correo destinatario para la prueba"),
     subject: str = Query("Prueba de envío", description="Asunto del correo"),
 ):
@@ -32,7 +32,7 @@ def test_email(
     <p>Este es un correo de prueba enviado mediante Resend API desde el backend FastAPI.</p>
     """
 
-    result = email_service.send_email(
+    result = await email_service.send_email(
         to=to,
         subject=subject,
         html_body=html_body,

@@ -47,12 +47,12 @@ def create_deal(
 
 
 @router.put("/{deal_id}", response_model=ApiResponse[Deal])
-def update_deal(
+async def notify_deal(
     deal_id: str,
     payload: DealUpdate,
     current_user=Depends(require_role(["root", "admin", "user"])),
 ):
-    return controller.update_deal(current_user, deal_id, payload)
+    return await controller.send_email(current_user, deal_id, payload)
 
 
 @router.delete("/{deal_id}")

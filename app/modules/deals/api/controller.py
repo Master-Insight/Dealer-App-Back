@@ -45,7 +45,7 @@ class DealController:
         result = self.service.delete_deal(profile, deal_id)
         return ResponseBuilder.success(result, "Gestión eliminada correctamente")
 
-    def send_email(self, profile: Dict, deal_id: str, payload: DealEmailRequest):
+    async def send_email(self, profile: Dict, deal_id: str, payload: DealEmailRequest):
         deal = self.service.get_by_id(deal_id)
         if profile.get("role") == "user" and deal.get("advisor_id") != profile.get(
             "id"
@@ -54,7 +54,7 @@ class DealController:
 
             raise AuthError("No puedes notificar esta gestión")
 
-        result = self.service.send_confirmation_email(
+        result = await self.service.send_confirmation_email(
             deal=deal,
             to_email=payload.email,
             subject=payload.subject,

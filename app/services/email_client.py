@@ -13,8 +13,8 @@ from __future__ import annotations
 import json
 import logging
 from typing import Any, Dict, Optional
-from urllib.error import HTTPError, URLError
-from urllib.request import Request, urlopen
+
+import httpx
 
 from app.config.settings import settings
 
@@ -29,7 +29,7 @@ class EmailService:
     def __init__(self, api_key: Optional[str] = None) -> None:
         self.api_key = api_key or settings.RESEND_API_KEY
 
-    def send_email(
+    async def send_email(
         self,
         *,
         to: str,
@@ -57,39 +57,31 @@ class EmailService:
             "html": html_body,
         }
 
-        request = Request(
-            self.RESEND_ENDPOINT,
-            data=json.dumps(payload).encode("utf-8"),
-            headers={
-                "Authorization": f"Bearer {self.api_key}",
-                "Content-Type": "application/json",
-            },
-            method="POST",
-        )
-
         try:
-            with urlopen(request, timeout=10) as response:
-                body = response.read().decode("utf-8")
-                logger.info("Email enviado a %s", to)
-                return {
-                    "sent": True,
-                    "status": response.status,
-                    "body": body,
-                }
-        except HTTPError as error:
+            async with httpx.AsyncClient(timeout=10.0) as client:
+                response = await client.post(
+                    self.RESEND_ENDPOINT,
+                    headers={
+                        "Authorization": f"Bearer {self.api_key}",
+                        "Content-Type": "application/json",
+                    },
+                    content=json.dumps(payload).encode("utf-8"),
+                )
+                response.raise_for_status()
+        except httpx.HTTPStatusError as error:
             logger.exception("Error HTTP al enviar email a %s", to)
             return {
                 "sent": False,
                 "reason": "http_error",
-                "status": error.code,
-                "body": error.read().decode("utf-8") if error.fp else None,
+                "status": error.response.status_code,
+                "body": error.response.text,
             }
-        except URLError as error:
+        except httpx.TransportError as error:
             logger.exception("No se pudo contactar a Resend para %s", to)
             return {
                 "sent": False,
                 "reason": "connection_error",
-                "details": str(error.reason),
+                "details": str(error),
             }
         except Exception as error:  # pragma: no cover - salvaguarda general
             logger.exception("Error inesperado al enviar email a %s", to)
@@ -98,6 +90,13 @@ class EmailService:
                 "reason": "unexpected_error",
                 "details": str(error),
             }
+
+        logger.info("Email enviado a %s", to)
+        return {
+            "sent": True,
+            "status": response.status_code,
+            "body": response.text,
+        }
 
 
 email_service = EmailService()

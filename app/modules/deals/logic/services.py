@@ -97,7 +97,7 @@ class DealService(BaseService):
         }
         return self.delete(deal_id, audit_metadata=metadata)
 
-    def send_confirmation_email(
+    async def send_confirmation_email(
         self, *, deal: Dict, to_email: str, subject: str, message: Optional[str]
     ):
         html_message = message or (
@@ -108,7 +108,7 @@ class DealService(BaseService):
             """
         )
 
-        return email_service.send_email(
+        return await email_service.send_email(
             to=to_email,
             subject=subject,
             html_body=html_message,
